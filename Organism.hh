@@ -64,22 +64,10 @@ public:
     static Organism reproduce(const Organism& o1, const Organism& o2, string o1_,
                               string o2_, const vector<int>& l);
 private:
-    /**
-     * Keeps track of the sex of this Oorganism
-     */
-    bool male;
-    /**
-     * Name of the father
-     */
-    string father;
-    /**
-     * Name of the mother
-     */
-    string mother;
-    /**
-     * The ADN of this Organism
-     */
-    vector<pair<Chromosome, Chromosome> > ADN;
+    bool male; /**< Keeps track of the sex of this Oorganism */
+    string father; /**< Name of the father */
+    string mother; /**< Name of the mother */
+    vector<pair<Chromosome, Chromosome> > ADN; /**< The ADN of this Organism */
 };
 
 #endif /* ORGANISM_HH_ */

@@ -53,10 +53,7 @@ public:
     static pair<Chromosome, Chromosome> crossover(const Chromosome& c1, const Chromosome& c2,
                                                   int cross_point, int size);
 private:
-    /**
-     * Stores the genes in this Chromosome
-     */
-    vector<gene> genes;
+    vector<gene> genes; /**< Stores the genes in this Chromosome */
 };
 
 #endif /* CHROMOSOME_HH_ */
