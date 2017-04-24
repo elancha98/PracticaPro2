@@ -12,12 +12,6 @@ int main() {
     // SETUP
     Specie specie = Specie::read();
     string name, n1, n2, n3;
-    int m;
-    cin >> m;
-    for (int i = 0; i < m; i++) {
-        cin >> name;
-        specie.add_organism(name, specie.read_organism());
-    }
     // MAIN LOOP
     while (cin >> name and name != "acabar") {
         if (name == "anadir_individuo") {

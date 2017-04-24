@@ -153,6 +153,12 @@ Specie Specie::read() {
     for (int i = 0; i <= s.N; i++)
         cin >> s.l[i];
     cin >> s.lx >> s.ly;
+    int m;
+    cin >> m;
+    for (int i = 0; i < m; i++) {
+        cin >> name;
+        s.add_organism(name, s.read_organism());
+    }
     return s;
 }
 

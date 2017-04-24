@@ -75,6 +75,7 @@ public:
     string check_genealogical_tree(Organism root, bool& success) const;
 
     /**
+     * Reads a Specie and it's initial population from the console
      * @return a Specie read from the console
      */
     static Specie read();
