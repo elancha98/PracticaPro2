@@ -154,6 +154,7 @@ Specie Specie::read() {
         cin >> s.l[i];
     cin >> s.lx >> s.ly;
     int m;
+    string name;
     cin >> m;
     for (int i = 0; i < m; i++) {
         cin >> name;
@@ -163,49 +164,36 @@ Specie Specie::read() {
 }
 
 bool Specie::are_family(string o1, string o2) {
-    queue<string> q1, q2;
-    set<string> s1, s2;
-    q1.push(o1);
-    q2.push(o2);
-    int added_1 = 1, added_2 = 1, adding = 0;
-    bool b = true;
-    while ( (not q1.empty()) or (not q2.empty()) ) {
-        for (int i = 0; i < added_1; i++) {
-            set<string>::const_iterator it = s2.find(q1.front());
-            if (it != s2.end())
-                return true;
-            Organism org = get(q1.front());
-            if (org.get_father() != "$") {
-                q1.push(org.get_father());
-                adding++;
-            }
-            if (org.get_mother() != "$") {
-                q1.push(org.get_mother());
-                adding++;
-            }
-            s1.insert(q1.front());
-            q1.pop();
-        }
-        added_1 = adding;
-        adding = 0;
-        for (int i = 0; i < added_2; i++) {
-            set<string>::const_iterator it = s1.find(q2.front());
-            if (it != s1.end())
-                return true;
-            Organism org = get(q2.front());
-            if (org.get_father() != "$") {
-                q1.push(org.get_father());
-                adding++;
-            }
-            if (org.get_mother() != "$") {
-                q2.push(org.get_mother());
-                adding++;
-            }
-            s2.insert(q2.front());
-            q2.pop();
-        }
-        added_1 = adding;
-        adding = 0;
+    Organism org1 = get(o1), org2 = get(o2);
+    if (o1 == o2 or org1.get_father() == o2 or org1.get_mother() == o2
+            or org2.get_father() == o1 or org2.get_mother() == o2)
+        return true;
+    queue<string> to_check;
+    to_check.push(o1);
+    while (!to_check.empty()) {
+        Organism o = get(to_check.front());
+        if (o.get_father() == o2)
+            return true;
+        else if (o.get_father() != "$")
+            to_check.push(o.get_father());
+        if (o.get_mother() == o2)
+            return true;
+        else if (o.get_mother() != "$")
+            to_check.push(o.get_mother());
+        to_check.pop();
     }
-    return true;
+    to_check.push(o2);
+    while (!to_check.empty()) {
+        Organism o = get(to_check.front());
+        if (o.get_father() == o1)
+            return true;
+        else if (o.get_father() != "$")
+            to_check.push(o.get_father());
+        if (o.get_mother() == o1)
+            return true;
+        else if (o.get_mother() != "$")
+            to_check.push(o.get_mother());
+        to_check.pop();
+    }
+    return false;
 }

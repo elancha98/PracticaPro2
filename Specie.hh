@@ -95,7 +95,7 @@ private:
     /**
      * @throws exceptions::ElementNotFoundException if there's no Organism with name \b o1 or
      *     there's no Organism with name \b o2
-     * @return whether \b o1 and \b o2 are family, that is, they are brothers or one is the other's parent
+     * @return whether \b o1 and \b o2 are family, that is, they are brothers or one is the other's predecessor
      * @param o1 the first Organism to be checked
      * @param o2 the second Organism to be checked
      */
