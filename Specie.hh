@@ -18,65 +18,64 @@ using namespace std;
 class Specie {
 public:
     /**
-     * Default constructor
+     * \pre true
+     * \post an empty Specie
      */
     Specie() : N(0), lx(0), ly(0), l(0), population() {};
     /**
-     * Default destructor
+     * \pre true
+     * \post destruct this Specie
      */
     ~Specie() {};
 
     /**
-     * Writes the population of this Specie to the console
+     * \pre true
+     * \post Writes the population of this Specie to the console
      */
     void write() const;
     /**
-     * @return a Organism read from the console (of this Specie)
+     * \pre there is an Organism ready to be read in the console
+     * \post returns an Organism read from the console (of this Specie)
      */
     Organism read_organism() const;
     /**
-     * @return the Organism of name \b name in the population.
-     * @throws exception::ElementNotFoundException if there's no Organism with name \b name
-     * @param name the name of the Organism to be returned
+     * \pre true
+     * \post returns the Organism of name \e name in the population (if it exists)
+     * @throws exception::ElementNotFoundException if there's no Organism with name \e name
      */
     Organism get(string name) const;
     /**
-     * Adds a Organism to the population.
-     * @throws exception::DuplicatedElementException if an Organism with name \b name already exist
-     * @param name the name of the Organism to be added
-     * @param o the Organism to be added
+     * \pre true
+     * \post Adds a Organism \e o to the population with name \e name.
+     * @throws exception::DuplicatedElementException if an Organism with name \e name already exist
      */
     void add_organism(string name, Organism o);
     /**
-     * Reproduces the Organism with name \b mother and the Organism with name \b father
-     * and adds the result Organism in the population (if the reproduction can be performed)
-     * @throws exception::ElementNotFoundException if there's no Organism with name \b mother or
-     * there's no Organism with name \b father
-     * @param mother the name of the mother
-     * @param father the name of the father
-     * @param name the name of the new Organism
-     * @returns true if the reproduction succeeded, false otherwise
+     * \pre true
+     * \post Reproduces the Organism with name \e mother and the Organism with name \e father
+     *     and adds the result Organism in the population with name \e name (if the reproduction can be performed)
+     * @throws exception::ElementNotFoundException if there's no Organism with name \e mother or
+     *     there's no Organism with name \e father
      */
     bool reproduce(string mother, string father, string name);
     /**
-     * Writes genealogical tree of the Organism with name \b root
-     * @throws exception::ElementNotFoundException if there's no Organism with name \b root
-     * @param root the name of the Organism whose genealogical tree we want to know
+     * \pre true
+     * \post Writes genealogical tree of the Organism with name \e root
+     * @throws exception::ElementNotFoundException if there's no Organism with name \e root
      */
     void write_genealogical_tree(string root) const;
     /**
-     * Reads and checks a genealogical tree from the console.
-     * if success is true then assumes that the root of the tree is correct and checks it's parents recursively.
-     * Otherwise it reads the tree
-     * @return the tree that was read completed (if possible, no-sense \ref std::string otherwise)
-     * @param root the root of the tree
-     * @param success stores whether the tree read is a partial tree or not
+     * \pre there's a genealogical tree in the console ready to be read
+     * \post Reads and checks a genealogical tree from the console.
+     *     if \e success is true then assumes that the root of the tree is correct and checks it's parents recursively.
+     *     Otherwise it reads the tree.
+     *     Then returns the tree that was read completed (if possible, non-sense string otherwise)
      */
     string check_genealogical_tree(Organism root, bool& success) const;
 
     /**
-     * Reads a Specie and it's initial population from the console
-     * @return a Specie read from the console
+     * \pre there is Specie information and a initial population in the console ready to be read
+     * \post Reads a Specie and it's initial population from the console and then returns it
      */
     static Specie read();
 
@@ -93,13 +92,13 @@ private:
     map<string, Organism> population; /**< The population of this Specie */
 
     /**
+     * \pre true
+     * \post returns whether \e o1 and \e o2 can reproduce, that is, they are not brothers and
+     *     one is not the other's predecessor
      * @throws exceptions::ElementNotFoundException if there's no Organism with name \b o1 or
      *     there's no Organism with name \b o2
-     * @return whether \b o1 and \b o2 are family, that is, they are brothers or one is the other's predecessor
-     * @param o1 the first Organism to be checked
-     * @param o2 the second Organism to be checked
      */
-    bool are_family(string o1, string o2);
+    bool can_reproduce(string o1, string o2);
 };
 
 #endif /* SPECIE_HH_ */

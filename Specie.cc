@@ -74,7 +74,7 @@ bool Specie::reproduce(string o1, string o2, string name) {
 
     if (org1.is_male() or (not org2.is_male()))
         return false;
-    if (are_family(o1, o2))
+    if (!can_reproduce(o1, o2))
         return false;
 
     add_organism(name, result);
@@ -163,21 +163,21 @@ Specie Specie::read() {
     return s;
 }
 
-bool Specie::are_family(string o1, string o2) {
+bool Specie::can_reproduce(string o1, string o2) {
     Organism org1 = get(o1), org2 = get(o2);
     if (o1 == o2 or org1.get_father() == o2 or org1.get_mother() == o2
             or org2.get_father() == o1 or org2.get_mother() == o2)
-        return true;
+        return false;
     queue<string> to_check;
     to_check.push(o1);
     while (!to_check.empty()) {
         Organism o = get(to_check.front());
         if (o.get_father() == o2)
-            return true;
+            return false;
         else if (o.get_father() != "$")
             to_check.push(o.get_father());
         if (o.get_mother() == o2)
-            return true;
+            return false;
         else if (o.get_mother() != "$")
             to_check.push(o.get_mother());
         to_check.pop();
@@ -186,14 +186,14 @@ bool Specie::are_family(string o1, string o2) {
     while (!to_check.empty()) {
         Organism o = get(to_check.front());
         if (o.get_father() == o1)
-            return true;
+            return false;
         else if (o.get_father() != "$")
             to_check.push(o.get_father());
         if (o.get_mother() == o1)
-            return true;
+            return false;
         else if (o.get_mother() != "$")
             to_check.push(o.get_mother());
         to_check.pop();
     }
-    return false;
+    return true;
 }

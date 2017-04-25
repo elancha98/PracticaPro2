@@ -20,35 +20,36 @@ public:
     typedef bool gene;
 
     /**
-     * Default constructor
+     * \pre true
+     * \post returns an empty Chromosome
      */
     Chromosome() : genes(0) {};
     /**
-     * Constructor given the number of genes in the new Chromosome
-     * @param n_genes number of genes of the new Chromosome
+     * \pre \e n_genes > 0
+     * \post returns an empty Chromosome with \e n_genes genes
      */
     Chromosome(int n_genes) : genes(n_genes) {};
     /**
-     * Default destructor
+     * \pre true
+     * \post destruct this Chromosome
      */
     ~Chromosome() {};
 
     /**
-     * Writes this Chromosome to the console
+     * \pre true
+     * \post Writes this Chromosome to the console
      */
     void write() const;
 
     /**
-     * @return a Chromosome read from the console
-     * @param n_genes number of genes of the returned Chromosome
+     * \pre there is a Chromosome ready to be read in the console and \e n_genes > 0
+     * \post returns a Chromosome with \e n_genes read from the console
      */
     static Chromosome read(int n_genes);
     /**
-     * @return the result of the crossover of \b c1 and \b c2
-     * @param c1 the first Chromosome of the crossover
-     * @param c2 the second Chromosome of the crossover
-     * @param cross_point indicates the first cross point in the crossover
-     * @param size indicates the second cross point in the crossover
+     * \pre \e cross_point and \e size less than number of Chromosome of \e c1 and \e c2
+     * \post the result of the crossover of \e c1 and \e c2, where \e cross_point indicates where the first
+     *     cross point is and \e size indicates where the second cross point is
      */
     static pair<Chromosome, Chromosome> crossover(const Chromosome& c1, const Chromosome& c2,
                                                   int cross_point, int size);
