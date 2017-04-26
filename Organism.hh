@@ -15,38 +15,45 @@ using namespace std;
 class Organism {
 public:
     /**
+     * @brief Default constructor
      * \pre true
      * \post returns an empty male Organism
      */
     Organism() : male(true), father("$"), mother("$"), ADN(0) {};
     /**
+     * @brief Constructor given sex and ADN
      * \pre true
      * \post returns an Organism that is male if \e m is true and it's ADN is \e v
      */
-    Organism(bool m, vector<pair<Chromosome, Chromosome> > v) : male(m), father("$"), mother("$"), ADN(v) {};
+    Organism(bool m, const vector<pair<Chromosome, Chromosome> >& v) : male(m), father("$"), mother("$"), ADN(v) {};
     /**
+     * @brief Default destructor
      * \pre true
      * \post destruct this Organism
      */
     ~Organism() {};
 
     /**
+     * @brief \b male getter
      * \pre true
      * \post returns whether this Organism is male or not
      */
     inline bool is_male() const { return male; };
     /**
+     * \brief \b father getter
      * \pre true
      * \post returns the name of the father of this Organism
      */
     inline string get_father() const { return father; };
     /**
+     * @brief \b mother getter
      * \pre true
      * \post returns the name of the mother of this Organism
      */
     inline string get_mother() const { return mother; };
 
     /**
+     * @brief Writes sex and parents to the console
      * \pre true
      * \post Writes the sex and the parents of this Organism to the console
      */
@@ -58,6 +65,7 @@ public:
     void write_genotype() const;
 
     /**
+     * @brief reproduces two Organism
      * \pre \e o1 and \e o2 can reproduce
      * \post returns an Organism result of the reproduction of \e o1 and \e o2. Note: \e o1_ is the name of \e o1,
      *     |e o2_ is the name of \e o2 and \e l is a vector that contains l0..ln

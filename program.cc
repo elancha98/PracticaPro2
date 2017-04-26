@@ -2,6 +2,11 @@
 // Created by ernesto on 23/04/17.
 //
 
+/**
+ * @mainpage Main program. Reads commands from the console and executes them
+ * @brief Reads commands from the console and executes them
+ */
+
 #include <iostream>
 #include "Specie.hh"
 #include "Exceptions.hh"

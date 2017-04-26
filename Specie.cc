@@ -111,7 +111,7 @@ void Specie::write_genealogical_tree(string root) const {
     cout << "Nivel " << level << ":" << lvl << endl;
 }
 
-string Specie::check_genealogical_tree(Organism root, bool& success) const {
+string Specie::check_genealogical_tree(const Organism& root, bool& success) const {
     string mother, father, res = "";
     cin >> father;
     if (father == "$") {

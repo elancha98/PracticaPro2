@@ -18,62 +18,73 @@ using namespace std;
 class Specie {
 public:
     /**
+     * @brief Default constructor
      * \pre true
      * \post an empty Specie
      */
     Specie() : N(0), lx(0), ly(0), l(0), population() {};
     /**
+     * @brief Default destructor
      * \pre true
      * \post destruct this Specie
      */
     ~Specie() {};
 
     /**
+     * @brief writes the population of this Specie
      * \pre true
      * \post Writes the population of this Specie to the console
      */
     void write() const;
     /**
+     * @brief Reads an Organism from the console
      * \pre there is an Organism ready to be read in the console
      * \post returns an Organism read from the console (of this Specie)
      */
     Organism read_organism() const;
     /**
+     * @brief Get Organism with name \e name
      * \pre true
      * \post returns the Organism of name \e name in the population (if it exists)
      * @throws exception::ElementNotFoundException if there's no Organism with name \e name
      */
     Organism get(string name) const;
     /**
+     * @brief Add Organism with name \e name
      * \pre true
      * \post Adds a Organism \e o to the population with name \e name.
      * @throws exception::DuplicatedElementException if an Organism with name \e name already exist
      */
     void add_organism(string name, Organism o);
     /**
+     * @brief Reproduce two Organism
      * \pre true
      * \post Reproduces the Organism with name \e mother and the Organism with name \e father
-     *     and adds the result Organism in the population with name \e name (if the reproduction can be performed)
+     *     and adds the result Organism in the population with name \e name (if the reproduction can be performed).
+     *     Returns true if the reproduction can be performed
      * @throws exception::ElementNotFoundException if there's no Organism with name \e mother or
      *     there's no Organism with name \e father
      */
     bool reproduce(string mother, string father, string name);
     /**
+     * @brief Write genealogical tree of Organism \e name
      * \pre true
      * \post Writes genealogical tree of the Organism with name \e root
      * @throws exception::ElementNotFoundException if there's no Organism with name \e root
      */
     void write_genealogical_tree(string root) const;
     /**
+     * @brief Reads and checks genealogical tree of Organism \e root
      * \pre there's a genealogical tree in the console ready to be read
      * \post Reads and checks a genealogical tree from the console.
      *     if \e success is true then assumes that the root of the tree is correct and checks it's parents recursively.
      *     Otherwise it reads the tree.
      *     Then returns the tree that was read completed (if possible, non-sense string otherwise)
      */
-    string check_genealogical_tree(Organism root, bool& success) const;
+    string check_genealogical_tree(const Organism& root, bool& success) const;
 
     /**
+     * @brief Reads a Specie from the console
      * \pre there is Specie information and a initial population in the console ready to be read
      * \post Reads a Specie and it's initial population from the console and then returns it
      */
