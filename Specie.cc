@@ -9,7 +9,7 @@ Organism Specie::empty;
 
 void Specie::write() const {
     for (iter it = population.begin(); it != population.end(); it++) {
-        cout << it->first << " ";
+        cout << "  " << it->first << " ";
         it->second.write();
     }
 }
