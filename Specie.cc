@@ -91,7 +91,7 @@ void Specie::write_genealogical_tree(string root) const {
             count = 0;
             added = adding;
             adding = 0;
-            cout << "Nivel " << level++ << ":" << lvl << endl;
+            cout << "  Nivel " << level++ << ":" << lvl << endl;
             lvl = "";
         } else {
             Organism o = get(to_check.front());
@@ -108,7 +108,7 @@ void Specie::write_genealogical_tree(string root) const {
             count++;
         }
     }
-    cout << "Nivel " << level << ":" << lvl << endl;
+    cout << "  Nivel " << level << ":" << lvl << endl;
 }
 
 string Specie::check_genealogical_tree(const Organism& root, bool& success) const {

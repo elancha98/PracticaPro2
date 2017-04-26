@@ -12,15 +12,15 @@ void Organism::write() const {
 }
 
 void Organism::write_genotype() const {
-    cout << "X:";
+    cout << "  X:";
     ADN[0].first.write();
-    if (male) cout << "Y:";
-    else cout << "X:";
+    if (male) cout << "  Y:";
+    else cout << "  X:";
     ADN[0].second.write();
     for (int i = 1; i < ADN.size(); i++) {
-        cout << i << ".1:";
+        cout << "  " << i << ".1:";
         ADN[i].first.write();
-        cout << i << ".2:";
+        cout << "  " << i << ".2:";
         ADN[i].second.write();
     }
 }
