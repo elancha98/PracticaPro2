@@ -3,11 +3,15 @@
 //
 
 /**
- * @mainpage Main program. Reads commands from the console and executes them
+ * @mainpage Main program. Reads commands from the console and executes them.
+ *     It reads a Specie, a initial population and then performs operations over
+ *     that population. Operations like adding a new Organism, reproduce two members
+ *     or print the genotype of an Organism.
  * @brief Reads commands from the console and executes them
  */
 
 #include <iostream>
+#include "Organism.hh"
 #include "Specie.hh"
 #include "Exceptions.hh"
 
@@ -24,39 +28,38 @@ int main() {
             cout << name << " " << n1 << endl;
             try {
                 specie.add_organism(n1, specie.read_organism());
-            } catch (exceptions::DuplicatedElementException& e) {cout << "error" << endl;}
+            } catch (exceptions::DuplicatedElementException& e) {cout << "  error" << endl;}
         } else if (name == "reproduccion_sexual") {
             cin >> n1 >> n2 >> n3;
             cout << name << " " << n1 << " " << n2 << " " << n3 << endl;
             try {
                 if (not specie.reproduce(n1, n2, n3))
-                    cout << "no es posible reproduccion" << endl;
+                    cout << "  no es posible reproduccion" << endl;
             } catch (exceptions::ElementNotFoundException& e) {
-                cout << "error" << endl;
-            } catch (exceptions::DuplicatedElementException& e) { cout << "error" << endl;
+                cout << "  error" << endl;
+            } catch (exceptions::DuplicatedElementException& e) { cout << "  error" << endl;
             }
         } else if (name == "escribir_arbol_genealogico") {
             cin >> n1;
             cout << name << " " << n1 << endl;
             try {
                 specie.write_genealogical_tree(n1);
-            } catch (exceptions::ElementNotFoundException& e) { cout << "error" << endl; }
+            } catch (exceptions::ElementNotFoundException& e) { cout << "  error" << endl; }
         } else if (name == "completar_arbol_genealogico") {
             cin >> n1;
             cout << name << " " << n1 << endl;
             bool success = true;
             try {
-                n2 = "";
                 Organism o = specie.get(n1);
-                string res = specie.check_genealogical_tree(o, success);
+                n2 = specie.check_genealogical_tree(o, success);
                 if (success)
-                    cout << n1 << res << endl;
+                    cout << "  " << n1 << n2 << endl;
                 else
-                    cout << "no es arbol parcial" << endl;
+                    cout << "  no es arbol parcial" << endl;
             } catch (exceptions::ElementNotFoundException& e) {
                 success = false;
                 specie.check_genealogical_tree(Specie::empty, success);
-                cout << "no es arbol parcial" << endl;
+                cout << "  no es arbol parcial" << endl;
             }
         } else if (name == "escribir_poblacion") {
             cout << name << endl;
@@ -66,9 +69,9 @@ int main() {
             cout << name << " " << n1 << endl;
             try {
                 specie.get(n1).write_genotype();
-            } catch (exceptions::ElementNotFoundException& e) { cout << "error" << endl; }
+            } catch (exceptions::ElementNotFoundException& e) { cout << "  error" << endl; }
         } else {
-            throw exceptions::IllegalArgumentException("Invalid command");
+            throw exceptions::IllegalArgumentException("  Invalid command");
         }
     }
     cout << name << endl;
