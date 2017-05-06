@@ -55,11 +55,12 @@ public:
      * \post If it can, it adds the Organism \e o to the population with name \e name and returns true,
      *     If there's already an Organism with name \e name, it just returns false
      */
-    bool add_organism(string name, Organism o) {
-            Relation r;
-            r.father = relations.end();
-            r.mother = relations.end();
-            return add_organism(name, o, r);
+    bool add_organism(string name, const Organism& o) {
+            Individual r;
+            r.father = population.end();
+            r.mother = population.end();
+            r.org = o;
+            return add_organism(name, r);
     };
     /**
      * @brief Reproduce two Organism
@@ -81,8 +82,8 @@ public:
 
     pair<string, bool> check_genealogical_tree(string root) const {
         bool b = true;
-        map<string, Relation>::const_iterator it = relations.find(root);
-        if (it == relations.end())
+        map<string, Individual>::const_iterator it = population.find(root);
+        if (it == population.end())
             b = false;
         return make_pair(root + check_genealogical_tree(it, b), b);
     };
@@ -98,22 +99,21 @@ private:
     int ly; /**< The number of genes of the Y Chromosome of the specie */
     vector<int> l; /**< The number of genes of the non-sexual Chromosome of this Specie */
 
-    struct Relation {
-        map<string, Relation>::const_iterator father;
-        map<string, Relation>::const_iterator mother;
-        list<Organism>::const_iterator org;
+    struct Individual {
+        map<string, Individual>::const_iterator father;
+        map<string, Individual>::const_iterator mother;
+        Organism org;
     };
-    list<Organism> population; /**< The population of this Specie */
-    map<string, Relation> relations; /**< The relations between the population */
+    map<string, Individual> population; /**< The population of this Specie */
 
     /**
      * \pre true
      * \post returns whether \e o1 and \e o2 can reproduce, that is, they are not brothers and
      *     one is not the other's predecessor
      */
-    bool can_reproduce(map<string, Relation>::const_iterator it1, map<string, Relation>::const_iterator it2);
+    bool can_reproduce(map<string, Individual>::const_iterator it1, map<string, Individual>::const_iterator it2);
 
-    bool add_organism(string name, const Organism& o, const Relation& r);
+    bool add_organism(string name, const Individual& ind);
 
     /**
      * @brief Reads and checks genealogical tree of Organism \e root
@@ -123,7 +123,8 @@ private:
      *     Otherwise it reads the tree.
      *     Then returns the tree that was read completed (if possible, non-sense string otherwise)
      */
-    string check_genealogical_tree(map<string, Relation>::const_iterator root, bool& success) const;
+    string check_genealogical_tree(map<string, Individual>::const_iterator root, bool& success) const;
+    string get_genealogical_tree(map<string, Individual>::const_iterator root) const;
 };
 
 #endif /* SPECIE_HH_ */

@@ -5,19 +5,19 @@
 #include "Specie.hh"
 
 void Specie::write() const {
-    for (map<string, Relation>::const_iterator it = relations.begin(); it != relations.end(); it++) {
+    for (map<string, Individual>::const_iterator it = population.begin(); it != population.end(); it++) {
         cout << "  " << it->first << " X";
-        if ((*it->second.org).is_male())
+        if (it->second.org.is_male())
             cout << "Y";
         else
             cout << "X";
         cout << " (";
-        if (it->second.father != relations.end())
+        if (it->second.father != population.end())
             cout << it->second.father->first;
         else
             cout << "$";
         cout << ",";
-        if (it->second.mother != relations.end())
+        if (it->second.mother != population.end())
             cout << it->second.mother->first;
         else
             cout << "$";
@@ -26,10 +26,10 @@ void Specie::write() const {
 }
 
 Organism Specie::get(string name) const {
-    map<string, Relation>::const_iterator it = relations.find(name);
-    if (it == relations.end())
+    map<string, Individual>::const_iterator it = population.find(name);
+    if (it == population.end())
         throw exceptions::ElementNotFoundException(name + " does not exist");
-    return *it->second.org;
+    return it->second.org;
 }
 
 Organism Specie::read_organism() const {
@@ -56,48 +56,47 @@ Organism Specie::read_organism() const {
     return Organism(male, v);
 }
 
-bool Specie::add_organism(string name, const Organism& o, const Relation& r) {
-    pair<map<string, Relation>::iterator, bool> res = relations.insert(make_pair(name, r));
+bool Specie::add_organism(string name, const Individual& ind) {
+    pair<map<string, Individual>::iterator, bool> res = population.insert(make_pair(name, ind));
     if (not res.second)
         return false;
-    res.first->second.org = population.insert(population.end(), o);
     return true;
 }
 
 bool Specie::reproduce(string o1, string o2, string name) {
-    map<string, Relation>::const_iterator it1, it2;
+    map<string, Individual>::const_iterator it1, it2;
 
-    it1 = relations.find(o1);
-    if (it1 == relations.end()) {
+    it1 = population.find(o1);
+    if (it1 == population.end()) {
         for (int j, i = 0; i < (N+1)*3; i++)
             cin >> j;
         throw exceptions::ElementNotFoundException(o1 + " not found");
     }
 
-    it2 = relations.find(o2);
-    if (it2 == relations.end()) {
+    it2 = population.find(o2);
+    if (it2 == population.end()) {
         for (int j, i = 0; i < (N+1)*3; i++)
             cin >> j;
         throw exceptions::ElementNotFoundException(o2 + " not found");
     }
+    Individual ind;
+    ind.father = it2;
+    ind.mother = it1;
+    ind.org = Organism::reproduce(it1->second.org, it2->second.org, l);
 
-    Organism result = Organism::reproduce(*it1->second.org, *it2->second.org, l);
-
-    if ((*it1->second.org).is_male() or (not (*it2->second.org).is_male()))
+    if (it1->second.org.is_male() or (not it2->second.org.is_male()))
         return false;
     if (!can_reproduce(it1, it2))
         return false;
-    Relation r;
-    r.father = it2;
-    r.mother = it1;
-    add_organism(name, result, r);
+
+    add_organism(name, ind);
     return true;
 }
 
 void Specie::write_genealogical_tree(string root) const {
-    queue<map<string, Relation>::const_iterator> to_check;
-    map<string, Relation>::const_iterator it = relations.find(root);
-    if (it == relations.end())
+    queue<map<string, Individual>::const_iterator> to_check;
+    map<string, Individual>::const_iterator it = population.find(root);
+    if (it == population.end())
         throw exceptions::ElementNotFoundException(root + " does not exist");
     to_check.push(it);
     int count = 0, added = 0, adding = 1, level = 0;
@@ -108,13 +107,12 @@ void Specie::write_genealogical_tree(string root) const {
             adding = 0;
             cout << endl << "  Nivel " << level++ << ":";
         } else {
-            Relation r = to_check.front()->second;
-            if (r.father != relations.end()) {
-                to_check.push(r.father);
+            if (to_check.front()->second.father != population.end()) {
+                to_check.push(to_check.front()->second.father);
                 adding++;
             }
-            if (r.mother != relations.end()) {
-                to_check.push(r.mother);
+            if (to_check.front()->second.mother != population.end()) {
+                to_check.push(to_check.front()->second.mother);
                 adding++;
             }
             cout << " " << to_check.front()->first;
@@ -125,36 +123,36 @@ void Specie::write_genealogical_tree(string root) const {
     cout << endl;
 }
 
-string Specie::check_genealogical_tree(map<string, Relation>::const_iterator root, bool& success) const {
+string Specie::check_genealogical_tree(map<string, Individual>::const_iterator root, bool& success) const {
     string mother, father, res = "";
     cin >> father;
     if (father == "$") {
-        if (success and root->second.father != relations.end())
-            res += " *" + root->second.father->first + "* $ $";
+        if (success and root->second.father != population.end())
+            res +=get_genealogical_tree(root->second.father);
         else
             res += " $";
     } else {
-        if (success and root->second.father != relations.end() and root->second.father->first == father) {
+        if (success and root->second.father != population.end() and root->second.father->first == father) {
             res += " " + father;
             res += check_genealogical_tree(root->second.father, success);
         } else {
             success = false;
-            check_genealogical_tree(relations.end(), success);
+            check_genealogical_tree(population.end(), success);
         }
     }
     cin >> mother;
     if (mother == "$"){
-        if (success and root->second.mother != relations.end())
-            res += " *" + root->second.mother->first + "* $ $";
+        if (success and root->second.mother != population.end())
+            res += get_genealogical_tree( root->second.mother);
         else
             res += " $";
     } else {
-        if (success and root->second.mother != relations.end() and root->second.mother->first == mother) {
+        if (success and root->second.mother != population.end() and root->second.mother->first == mother) {
             res += " " + mother;
             res += check_genealogical_tree(root->second.mother, success);
         } else {
             success = false;
-            check_genealogical_tree(relations.end(), success);
+            check_genealogical_tree(population.end(), success);
         }
     }
     return res;
@@ -177,20 +175,20 @@ Specie Specie::read() {
     return s;
 }
 
-bool Specie::can_reproduce(map<string, Relation>::const_iterator it1, map<string, Relation>::const_iterator it2) {
-    queue<map<string, Relation>::const_iterator> to_check;
+bool Specie::can_reproduce(map<string, Individual>::const_iterator it1, map<string, Individual>::const_iterator it2) {
+    queue<map<string, Individual>::const_iterator> to_check;
     to_check.push(it1);
     to_check.push(it2);
     if (it1 == it2)
         return false;
     while (!to_check.empty()) {
-        if (to_check.front()->second.father != relations.end()) {
+        if (to_check.front()->second.father != population.end()) {
             if (to_check.front()->second.father == it1 or to_check.front()->second.father == it2)
                 return false;
             else
                 to_check.push(to_check.front()->second.father);
         }
-        if (to_check.front()->second.mother != relations.end()) {
+        if (to_check.front()->second.mother != population.end()) {
             if (to_check.front()->second.mother == it1 or to_check.front()->second.mother == it2)
                 return false;
             else
@@ -199,4 +197,18 @@ bool Specie::can_reproduce(map<string, Relation>::const_iterator it1, map<string
         to_check.pop();
     }
     return true;
+}
+
+string Specie::get_genealogical_tree(map<string, Individual>::const_iterator root) const {
+    string res = "";
+    res += " *" + root->first + "*";
+    if (root->second.father != population.end())
+        res += get_genealogical_tree(root->second.father);
+    else
+        res += " $";
+    if (root->second.mother != population.end())
+        res += get_genealogical_tree(root->second.mother);
+    else
+        res += " $";
+    return res;
 }

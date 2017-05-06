@@ -26,7 +26,8 @@ int main() {
         if (name == "anadir_individuo") {
             cin >> n1;
             cout << name << " " << n1 << endl;
-            bool b = specie.add_organism(n1, specie.read_organism());
+            Organism o = specie.read_organism();
+            bool b = specie.add_organism(n1, o);
             if (b == false)
                 cout << "  error" << endl;
         } else if (name == "reproduccion_sexual") {
