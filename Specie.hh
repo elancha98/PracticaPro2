@@ -111,7 +111,7 @@ private:
      * \post returns whether \e o1 and \e o2 can reproduce, that is, they are not brothers and
      *     one is not the other's predecessor
      */
-    bool can_reproduce(map<string, Individual>::const_iterator it1, map<string, Individual>::const_iterator it2);
+    bool are_family(map<string, Individual>::const_iterator it1, map<string, Individual>::const_iterator it2);
 
     bool add_organism(string name, const Individual& ind);
 

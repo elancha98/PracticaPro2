@@ -1,3 +1,0 @@
-//TODO remove exceptions
-//TODO implement iterators
-//TODO comment check_genealogical_tree

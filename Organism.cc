@@ -27,7 +27,7 @@ Organism Organism::reproduce(const Organism& o1, const Organism& o2, const vecto
 
     for (unsigned i = 0; i < o1.ADN.size(); i++) {
         cin >> a1 >> a2 >> cross_point;
-        if (i == 0 and a2 == 0) o.male = false;
+        if (i == 0) o.male = a2;
         if (a1) c1 = o1.ADN[i].second;
         else c1 = o1.ADN[i].first;
         if (a2) c2 = o2.ADN[i].second;

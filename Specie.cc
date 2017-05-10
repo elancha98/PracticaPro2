@@ -86,7 +86,9 @@ bool Specie::reproduce(string o1, string o2, string name) {
 
     if (it1->second.org.is_male() or (not it2->second.org.is_male()))
         return false;
-    if (!can_reproduce(it1, it2))
+    if (it1->second.father != population.end() and (it1->second.father == it2->second.father or it1->second.mother == it2->second.mother))
+        return false;
+    if (are_family(it1, it2))
         return false;
 
     add_organism(name, ind);
@@ -109,11 +111,8 @@ void Specie::write_genealogical_tree(string root) const {
         } else {
             if (to_check.front()->second.father != population.end()) {
                 to_check.push(to_check.front()->second.father);
-                adding++;
-            }
-            if (to_check.front()->second.mother != population.end()) {
                 to_check.push(to_check.front()->second.mother);
-                adding++;
+                adding += 2;
             }
             cout << " " << to_check.front()->first;
             to_check.pop();
@@ -175,40 +174,32 @@ Specie Specie::read() {
     return s;
 }
 
-bool Specie::can_reproduce(map<string, Individual>::const_iterator it1, map<string, Individual>::const_iterator it2) {
+bool Specie::are_family(map<string, Individual>::const_iterator it1, map<string, Individual>::const_iterator it2) {
     queue<map<string, Individual>::const_iterator> to_check;
     to_check.push(it1);
     to_check.push(it2);
     if (it1 == it2)
-        return false;
+        return true;
     while (!to_check.empty()) {
+        if (to_check.front()->second.father == it1 or to_check.front()->second.father == it2 or
+            to_check.front()->second.mother == it1 or to_check.front()->second.mother == it2)
+            return true;
         if (to_check.front()->second.father != population.end()) {
-            if (to_check.front()->second.father == it1 or to_check.front()->second.father == it2)
-                return false;
-            else
-                to_check.push(to_check.front()->second.father);
-        }
-        if (to_check.front()->second.mother != population.end()) {
-            if (to_check.front()->second.mother == it1 or to_check.front()->second.mother == it2)
-                return false;
-            else
-                to_check.push(to_check.front()->second.mother);
+            to_check.push(to_check.front()->second.father);
+            to_check.push(to_check.front()->second.mother);
         }
         to_check.pop();
     }
-    return true;
+    return false;
 }
 
 string Specie::get_genealogical_tree(map<string, Individual>::const_iterator root) const {
     string res = "";
     res += " *" + root->first + "*";
-    if (root->second.father != population.end())
+    if (root->second.father != population.end()) {
         res += get_genealogical_tree(root->second.father);
-    else
-        res += " $";
-    if (root->second.mother != population.end())
         res += get_genealogical_tree(root->second.mother);
-    else
-        res += " $";
+    } else
+        res += " $ $";
     return res;
 }

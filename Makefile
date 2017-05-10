@@ -58,6 +58,9 @@ Organism.o: Organism.cc
 Specie.o: Specie.cc
 	g++ -c Specie.cc $(OPCIONS)
 #
+tar: program.exe
+	rm practica.tar
+	tar -cvf practica.tar *.cc *.hh Makefile
 #
 # Realizad las modificaciones necesarias para gestionar las clases de la
 # sesión cuando os toque implementarlas a vosotros.
