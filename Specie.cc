@@ -58,9 +58,7 @@ Organism Specie::read_organism() const {
 
 bool Specie::add_organism(string name, const Individual& ind) {
     pair<map<string, Individual>::iterator, bool> res = population.insert(make_pair(name, ind));
-    if (not res.second)
-        return false;
-    return true;
+    return res.second;
 }
 
 bool Specie::reproduce(string o1, string o2, string name) {
@@ -84,6 +82,9 @@ bool Specie::reproduce(string o1, string o2, string name) {
     ind.mother = it1;
     ind.org = Organism::reproduce(it1->second.org, it2->second.org, l);
 
+    if (population.find(name) != population.end())
+        throw exceptions::ElementNotFoundException(name + " found");
+    
     if (it1->second.org.is_male() or (not it2->second.org.is_male()))
         return false;
     if (it1->second.father != population.end() and (it1->second.father == it2->second.father or it1->second.mother == it2->second.mother))
