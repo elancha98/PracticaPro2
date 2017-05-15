@@ -3,10 +3,11 @@ from random import randint
 import string
 import os
 
-a = True
-cases = 0
+cases = input("Casos de prueba: ")
+filename = raw_input("Nombre de la salida: ")
+gen = 0
 
-while (a):
+while (gen < cases):
     N = randint(1,10)
     l = []
     l0 = randint(1,10)
@@ -59,7 +60,7 @@ while (a):
     cmds = [anadir_individuo, reproduccion_sexual, escribir_arbol_genealogico, escribir_poblacion, escribir_genotipo]
     
     end = False
-    f = open("input.in", "w")
+    f = open(filename + "-" + str(gen) + ".in", "w")
     
     f.write(str(N) + "\n" + str(l0) + " ")
     for i in range(N):
@@ -73,15 +74,9 @@ while (a):
         else:
             f.write("acabar")
             f.close()
-    ok = os.popen("./correct.exe < input.in").read()
-    mi = os.popen("./program.exe < input.in").read()
+    f = open(filename + "-" + str(gen) + ".out", "w")
+    f.write(os.popen("./correct.exe < input.in").read())
+    f.close()
     
-    a = (ok == mi)
-    if (not a):
-        print ok
-        print "\n\n\n"
-        print mi
-    cases += 1
-    if (cases % 100 == 0):
-        print cases
+    gen += 1
 print "=====ENDED====="
