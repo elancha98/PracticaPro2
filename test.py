@@ -75,9 +75,16 @@ while (gen < cases):
             f.write("acabar")
             f.close()
     f = open(filename + "-" + str(gen) + ".out", "w")
+<<<<<<< HEAD
+    f.write(os.popen("./correct.exe < input.in").read())
+    f.close()
+    
+    gen += 1
+=======
     f.write(os.popen("./program.exe < " + filename + "-" + str(gen) + ".in").read())
     f.close()
     gen += 1
     if (gen % 10 == 0):
         print gen
+>>>>>>> origin/master
 print "=====ENDED====="

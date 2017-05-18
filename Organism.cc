@@ -4,13 +4,6 @@
 
 #include "Organism.hh"
 
-void Organism::write() const {
-    cout << 'X';
-    if (male) cout << 'Y';
-    else cout << 'X';
-    cout << " (" << father << "," << mother << ")" << endl;
-}
-
 void Organism::write_genotype() const {
     cout << "  X:";
     ADN[0].first.write();
@@ -25,11 +18,8 @@ void Organism::write_genotype() const {
     }
 }
 
-Organism Organism::reproduce(const Organism& o1, const Organism& o2, string o1_,
-                             string o2_, const vector<int>& l) {
+Organism Organism::reproduce(const Organism& o1, const Organism& o2, const vector<int>& l) {
     Organism o;
-    o.mother = o1_;
-    o.father = o2_;
 
     Chromosome c1, c2;
     bool a1, a2;
@@ -37,7 +27,7 @@ Organism Organism::reproduce(const Organism& o1, const Organism& o2, string o1_,
 
     for (unsigned i = 0; i < o1.ADN.size(); i++) {
         cin >> a1 >> a2 >> cross_point;
-        if (i == 0 and a2 == 0) o.male = false;
+        if (i == 0) o.male = a2;
         if (a1) c1 = o1.ADN[i].second;
         else c1 = o1.ADN[i].first;
         if (a2) c2 = o2.ADN[i].second;

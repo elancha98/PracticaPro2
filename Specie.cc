@@ -4,21 +4,32 @@
 
 #include "Specie.hh"
 
-typedef map<string, Organism>::const_iterator iter;
-Organism Specie::empty;
-
 void Specie::write() const {
-    for (iter it = population.begin(); it != population.end(); it++) {
-        cout << "  " << it->first << " ";
-        it->second.write();
+    for (map<string, Individual>::const_iterator it = population.begin(); it != population.end(); it++) {
+        cout << "  " << it->first << " X";
+        if (it->second.org.is_male())
+            cout << "Y";
+        else
+            cout << "X";
+        cout << " (";
+        if (it->second.father != population.end())
+            cout << it->second.father->first;
+        else
+            cout << "$";
+        cout << ",";
+        if (it->second.mother != population.end())
+            cout << it->second.mother->first;
+        else
+            cout << "$";
+        cout << ")" << endl;
     }
 }
 
 Organism Specie::get(string name) const {
-    iter it = population.find(name);
+    map<string, Individual>::const_iterator it = population.find(name);
     if (it == population.end())
         throw exceptions::ElementNotFoundException(name + " does not exist");
-    return it->second;
+    return it->second.org;
 }
 
 Organism Specie::read_organism() const {
@@ -45,102 +56,103 @@ Organism Specie::read_organism() const {
     return Organism(male, v);
 }
 
-void Specie::add_organism(string name, Organism o) {
-    pair<map<string, Organism>::iterator, bool> res = population.insert(pair<string, Organism>(name, o));
-    if (not res.second)
-        throw exceptions::DuplicatedElementException(name + " already exists");
+bool Specie::add_organism(string name, const Individual& ind) {
+    pair<map<string, Individual>::iterator, bool> res = population.insert(make_pair(name, ind));
+    return res.second;
 }
 
 bool Specie::reproduce(string o1, string o2, string name) {
-    map<string, Organism>::iterator it;
+    map<string, Individual>::const_iterator it1, it2;
 
-    it = population.find(o1);
-    if (it == population.end()) {
+    it1 = population.find(o1);
+    if (it1 == population.end()) {
         for (int j, i = 0; i < (N+1)*3; i++)
             cin >> j;
-        throw exceptions::ElementNotFoundException("Organism " + o1 + " doesn't exist");
+        throw exceptions::ElementNotFoundException(o1 + " not found");
     }
-    Organism org1 = it->second;
 
-    it = population.find(o2);
-    if (it == population.end()) {
+    it2 = population.find(o2);
+    if (it2 == population.end()) {
         for (int j, i = 0; i < (N+1)*3; i++)
             cin >> j;
-        throw exceptions::ElementNotFoundException("Organism " + o2 + " doesn't exist");
+        throw exceptions::ElementNotFoundException(o2 + " not found");
     }
-    Organism org2 = it->second;
+    Individual ind;
+    ind.father = it2;
+    ind.mother = it1;
+    ind.org = Organism::reproduce(it1->second.org, it2->second.org, l);
 
-    Organism result = Organism::reproduce(org1, org2, o1, o2, l);
-
-    if (org1.is_male() or (not org2.is_male()))
+    if (population.find(name) != population.end())
+        throw exceptions::ElementNotFoundException(name + " found");
+    
+    if (it1->second.org.is_male() or (not it2->second.org.is_male()))
         return false;
-    if (!can_reproduce(o1, o2))
+    if (it1->second.father != population.end() and (it1->second.father == it2->second.father or it1->second.mother == it2->second.mother))
+        return false;
+    if (are_family(it1, it2))
         return false;
 
-    add_organism(name, result);
+    add_organism(name, ind);
     return true;
 }
 
 void Specie::write_genealogical_tree(string root) const {
-    queue<string> to_check;
-    to_check.push(root);
-    int count = 0, added = 1, adding = 0, level = 0;
-    string lvl = "";
+    queue<map<string, Individual>::const_iterator> to_check;
+    map<string, Individual>::const_iterator it = population.find(root);
+    if (it == population.end())
+        throw exceptions::ElementNotFoundException(root + " does not exist");
+    to_check.push(it);
+    int count = 0, added = 0, adding = 1, level = 0;
     while (!to_check.empty()) {
         if (count == added) {
             count = 0;
             added = adding;
             adding = 0;
-            cout << "  Nivel " << level++ << ":" << lvl << endl;
-            lvl = "";
+            cout << endl << "  Nivel " << level++ << ":";
         } else {
-            Organism o = get(to_check.front());
-            if (o.get_father() != "$") {
-                to_check.push(o.get_father());
-                adding++;
+            if (to_check.front()->second.father != population.end()) {
+                to_check.push(to_check.front()->second.father);
+                to_check.push(to_check.front()->second.mother);
+                adding += 2;
             }
-            if (o.get_mother() != "$") {
-                to_check.push(o.get_mother());
-                adding++;
-            }
-            lvl += " " + to_check.front();
+            cout << " " << to_check.front()->first;
             to_check.pop();
             count++;
         }
     }
-    cout << "  Nivel " << level << ":" << lvl << endl;
+    cout << endl;
 }
 
-string Specie::check_genealogical_tree(const Organism& root, bool& success) const {
+string Specie::check_genealogical_tree(map<string, Individual>::const_iterator root, bool& success) const {
     string mother, father, res = "";
     cin >> father;
     if (father == "$") {
-        if (root.get_father() != "$")
-            res += " *" + root.get_father() + "* $ $";
+        if (success and root->second.father != population.end())
+            res +=get_genealogical_tree(root->second.father);
         else
             res += " $";
     } else {
-        if (success and father == root.get_father()) {
+        if (success and root->second.father != population.end() and root->second.father->first == father) {
             res += " " + father;
-            res += check_genealogical_tree(get(root.get_father()), success);
+            res += check_genealogical_tree(root->second.father, success);
         } else {
             success = false;
-            check_genealogical_tree(empty, success);
+            check_genealogical_tree(population.end(), success);
         }
     }
     cin >> mother;
     if (mother == "$"){
-        if (root.get_mother() != "$")
-            res += " *" + root.get_mother() + "* $ $";
+        if (success and root->second.mother != population.end())
+            res += get_genealogical_tree( root->second.mother);
         else
             res += " $";
     } else {
-        if (success and mother == root.get_mother()) {
+        if (success and root->second.mother != population.end() and root->second.mother->first == mother) {
             res += " " + mother;
-            res += check_genealogical_tree(get(root.get_mother()), success);
+            res += check_genealogical_tree(root->second.mother, success);
         } else {
             success = false;
-            check_genealogical_tree(empty, success);
+            check_genealogical_tree(population.end(), success);
         }
     }
     return res;
@@ -163,37 +175,32 @@ Specie Specie::read() {
     return s;
 }
 
-bool Specie::can_reproduce(string o1, string o2) {
-    Organism org1 = get(o1), org2 = get(o2);
-    if (o1 == o2 or org1.get_father() == o2 or org1.get_mother() == o2
-            or org2.get_father() == o1 or org2.get_mother() == o2)
-        return false;
-    queue<string> to_check;
-    to_check.push(o1);
+bool Specie::are_family(map<string, Individual>::const_iterator it1, map<string, Individual>::const_iterator it2) {
+    queue<map<string, Individual>::const_iterator> to_check;
+    to_check.push(it1);
+    to_check.push(it2);
+    if (it1 == it2)
+        return true;
     while (!to_check.empty()) {
-        Organism o = get(to_check.front());
-        if (o.get_father() == o2)
-            return false;
-        else if (o.get_father() != "$")
-            to_check.push(o.get_father());
-        if (o.get_mother() == o2)
-            return false;
-        else if (o.get_mother() != "$")
-            to_check.push(o.get_mother());
+        if (to_check.front()->second.father == it1 or to_check.front()->second.father == it2 or
+            to_check.front()->second.mother == it1 or to_check.front()->second.mother == it2)
+            return true;
+        if (to_check.front()->second.father != population.end()) {
+            to_check.push(to_check.front()->second.father);
+            to_check.push(to_check.front()->second.mother);
+        }
         to_check.pop();
     }
-    to_check.push(o2);
-    while (!to_check.empty()) {
-        Organism o = get(to_check.front());
-        if (o.get_father() == o1)
-            return false;
-        else if (o.get_father() != "$")
-            to_check.push(o.get_father());
-        if (o.get_mother() == o1)
-            return false;
-        else if (o.get_mother() != "$")
-            to_check.push(o.get_mother());
-        to_check.pop();
-    }
-    return true;
+    return false;
+}
+
+string Specie::get_genealogical_tree(map<string, Individual>::const_iterator root) const {
+    string res = "";
+    res += " *" + root->first + "*";
+    if (root->second.father != population.end()) {
+        res += get_genealogical_tree(root->second.father);
+        res += get_genealogical_tree(root->second.mother);
+    } else
+        res += " $ $";
+    return res;
 }

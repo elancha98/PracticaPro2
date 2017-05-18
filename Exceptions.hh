@@ -23,18 +23,6 @@ namespace exceptions {
     };
 
 /**
- * thrown when you try add a duplicated element to some data structure
- */
-    class DuplicatedElementException : public std::exception {
-    public:
-        DuplicatedElementException(const std::string mot) : exception(), error("Duplicated element exception caused by: " + mot) {};
-        virtual ~DuplicatedElementException() throw() {};
-        const char* what() const throw() { return error.c_str(); };
-    private:
-        const std::string error;
-    };
-
-/**
  * thrown when you try to access an element that doesn't exist
  */
     class ElementNotFoundException : public std::exception {
