@@ -3,7 +3,7 @@
 //
 
 /**
- * @mainpage Main program. Reads commands from the console and executes them.
+ * @mainpage Reads commands from the console and executes them.
  *     It reads a Specie, a initial population and then performs operations over
  *     that population. Operations like adding a new Organism, reproduce two members
  *     or print the genotype of an Organism.
@@ -11,14 +11,12 @@
  */
 
 #include <iostream>
-#include "Organism.hh"
 #include "Specie.hh"
-#include "Exceptions.hh"
 
 using namespace std;
 
 int main() {
-    // SETUP
+    // SETUP |
     Specie specie = Specie::read();
     string name, n1, n2, n3;
     // MAIN LOOP
@@ -36,7 +34,7 @@ int main() {
             try {
                 if (not specie.reproduce(n1, n2, n3))
                     cout << "  no es posible reproduccion" << endl;
-            } catch (exceptions::ElementNotFoundException& e) {
+            } catch (invalid_argument& e) {
                 cout << "  error" << endl;
             }
         } else if (name == "escribir_arbol_genealogico") {
@@ -44,14 +42,19 @@ int main() {
             cout << name << " " << n1;
             try {
                 specie.write_genealogical_tree(n1);
-            } catch (exceptions::ElementNotFoundException& e) { cout << endl << "  error" << endl; }
+            } catch (invalid_argument& e) { cout << endl << "  error" << endl; }
         } else if (name == "completar_arbol_genealogico") {
             cin >> n1;
             cout << name << " " << n1 << endl;
-            pair<string, bool> s = specie.check_genealogical_tree(n1);
-            if (s.second)
-                cout << "  " << s.first << endl;
-            else
+            pair<queue<string>, bool> s = specie.check_genealogical_tree(n1);
+            if (s.second) {
+                cout << "  ";
+                while (!s.first.empty()) {
+                    cout << s.first.front();
+                    s.first.pop();
+                }
+                cout << endl;
+            } else
                 cout << "  no es arbol parcial" << endl;
         } else if (name == "escribir_poblacion") {
             cout << name << endl;
@@ -61,9 +64,9 @@ int main() {
             cout << name << " " << n1 << endl;
             try {
                 specie.get(n1).write_genotype();
-            } catch (exceptions::ElementNotFoundException& e) { cout << "  error" << endl; }
+            } catch (invalid_argument& e) { cout << "  error" << endl; }
         } else {
-            throw exceptions::IllegalArgumentException("  Invalid command");
+            throw invalid_argument("  Invalid command");
         }
     }
     cout << name << endl;

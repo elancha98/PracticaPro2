@@ -40,6 +40,7 @@ public:
      */
     inline bool is_male() const { return male; };
     /**
+     * @brief Writes the genotype of this Organism
      * \pre true
      * \post Writes the genotype of this Organism to the console
      */

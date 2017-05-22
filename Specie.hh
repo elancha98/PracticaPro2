@@ -6,7 +6,6 @@
 #define SPECIE_HH_
 
 #include "Organism.hh"
-#include "Exceptions.hh"
 #include <iostream>
 #include <vector>
 #include <list>
@@ -46,14 +45,14 @@ public:
      * @brief Get Organism with name \e name
      * \pre true
      * \post returns the Organism of name \e name in the population (if it exists)
-     * @throws exception::ElementNotFoundException if there's no Organism with name \e name
+     * @throws invalid_argument if there's no Organism with name \e name
      */
     Organism get(string name) const;
     /**
      * @brief Add Organism with name \e name
      * \pre true
-     * \post If it can, it adds the Organism \e o to the population with name \e name and returns true,
-     *     If there's already an Organism with name \e name, it just returns false
+     * \post If it can, it adds the Organism \e o to the population with name \e name (and no parents)
+     *     and returns true, If there's already an Individual with name \e name, it just returns false
      */
     bool add_organism(string name, const Organism& o) {
             Individual r;
@@ -68,7 +67,7 @@ public:
      * \post Reproduces the Organism with name \e mother and the Organism with name \e father
      *     and adds the result Organism in the population with name \e name (if the reproduction can be performed).
      *     Returns true if the reproduction can be performed
-     * @throws exception::ElementNotFoundException if there's no Organism with name \e mother or
+     * @throws invalid_argument if there's no Organism with name \e mother or
      *     there's no Organism with name \e father
      */
     bool reproduce(string mother, string father, string name);
@@ -76,16 +75,27 @@ public:
      * @brief Write genealogical tree of Organism \e name
      * \pre true
      * \post Writes genealogical tree of the Organism with name \e root
-     * @throws exception::ElementNotFoundException if there's no Organism with name \e root
+     * @throws invalid_argument if there's no Organism with name \e root
      */
     void write_genealogical_tree(string root) const;
-
-    pair<string, bool> check_genealogical_tree(string root) const {
-        bool b = true;
+    /**
+     * @brief Read and check the genealogical tree of \e root
+     * \pre there is a tree ready to be read in the console
+     * \post returns a string queue where the completed tree is stored (the completed tree is
+     *     obtained by joining all the string together) and a boolean
+     *     that is true if the read tree is actually a parcial tree and false otherwise
+     */
+    pair<queue<string>, bool> check_genealogical_tree(string root) const {
+        queue<string> a;
+        a.push(root);
         map<string, Individual>::const_iterator it = population.find(root);
-        if (it == population.end())
-            b = false;
-        return make_pair(root + check_genealogical_tree(it, b), b);
+        if (it == population.end()) {
+            read_useless_tree();
+            read_useless_tree();
+            return make_pair(a, false);
+        }
+        bool b = check_genealogical_tree(it, a);
+        return make_pair(a, b);
     };
     /**
      * @brief Reads a Specie from the console
@@ -99,6 +109,10 @@ private:
     int ly; /**< The number of genes of the Y Chromosome of the specie */
     vector<int> l; /**< The number of genes of the non-sexual Chromosome of this Specie */
 
+    /**
+     * @brief Individual, social part of the population, stores an Organism and a
+     *     reference to it's parents
+     */
     struct Individual {
         map<string, Individual>::const_iterator father;
         map<string, Individual>::const_iterator mother;
@@ -107,24 +121,37 @@ private:
     map<string, Individual> population; /**< The population of this Specie */
 
     /**
-     * \pre true
-     * \post returns whether \e o1 and \e o2 can reproduce, that is, they are not brothers and
+     * \pre \e it1 and \e it2 point to an element in population
+     * \post returns whether \e it1 and \e it2 can reproduce, that is, they are not brothers and
      *     one is not the other's predecessor
      */
     bool are_family(map<string, Individual>::const_iterator it1, map<string, Individual>::const_iterator it2);
 
+    /**
+     * \pre true
+     * \post If it cans, it adds the Individual \e o to the population with name \e name and
+     *     returns true, If there's already an Individual with name \e name, it just returns false
+     */
     bool add_organism(string name, const Individual& ind);
 
     /**
-     * @brief Reads and checks genealogical tree of Organism \e root
-     * \pre there's a genealogical tree in the console ready to be read
-     * \post Reads and checks a genealogical tree from the console.
-     *     if \e success is true then assumes that the root of the tree is correct and checks it's parents recursively.
-     *     Otherwise it reads the tree.
-     *     Then returns the tree that was read completed (if possible, non-sense string otherwise)
+     * \pre \e root points to an element in population and there's a genealogical_tree ready to be
+     *     read in the console
+     * \post Reads a genealogical tree with root \e root. Returns true if the read tree was a
+     *     partial tree, in that case the completed read tree is added to \e res. If the read tree
+     *     was not a partial tree returns false (but adds things to \e res)
      */
-    string check_genealogical_tree(map<string, Individual>::const_iterator root, bool& success) const;
-    string get_genealogical_tree(map<string, Individual>::const_iterator root) const;
+    bool check_genealogical_tree(map<string, Individual>::const_iterator root, queue<string>& res) const;
+    /**
+     * \pre \e root points to an element in population
+     * \post Adds the complete genealogical tree of \e root to \e res
+     */
+    void add_genealogical_tree(map<string, Individual>::const_iterator root, queue<string>& res) const;
+    /**
+     * \pre there's a genealogical tree ready to be read in the console
+     * \post reads the tree (leaving the cin cursor at the end of the tree)
+     */
+    static void read_useless_tree();
 };
 
 #endif /* SPECIE_HH_ */
